@@ -1,8 +1,11 @@
 export default async function handler(req, res) {
+  // ✅ ADD THESE CORS HEADERS FIRST - This is the fix!
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'false');
   
+  // Handle preflight requests (OPTIONS method)
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
@@ -20,7 +23,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'API key not configured' });
     }
 
-    // Convert base64 to blob
+    // Convert base64 to buffer
     const base64Data = imageUrl.split(',')[1];
     const buffer = Buffer.from(base64Data, 'base64');
     
@@ -38,7 +41,7 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
+      throw new Error(`Imagine API Error: ${response.status}`);
     }
 
     const result = await response.json();
